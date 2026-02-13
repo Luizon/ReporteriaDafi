@@ -161,3 +161,4 @@
 /Users/jefrain/projects/reporteria/ReportesApi/obj/Debug/net8.0/ReportesApi.pdb
 /Users/jefrain/projects/reporteria/ReportesApi/obj/Debug/net8.0/ReportesApi.genruntimeconfig.cache
 /Users/jefrain/projects/reporteria/ReportesApi/obj/Debug/net8.0/ref/ReportesApi.dll
+/Users/jefrain/projects/reporteria/ReportesApi/obj/Debug/net8.0/ReportesApi.sourcelink.json

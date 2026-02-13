@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using ReportesApi.Data;
 using ReportesApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReportesApi.Controllers;
 
@@ -13,25 +14,27 @@ namespace ReportesApi.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IConfiguration _config;
 
-    public AuthController(AppDbContext context)
+    public AuthController(AppDbContext context, IConfiguration config)
     {
         _context = context;
+        _config = config;
     }
 
     [HttpPost("register")]
-    public IActionResult Register(User user)
+    public async Task<IActionResult> Register(User user)
     {
         _context.Users.Add(user);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpPost("login")]
-    public IActionResult Login(User login)
+    public async Task<IActionResult> Login(User login)
     {
-        var user = _context.Users
-            .FirstOrDefault(u => u.Username == login.Username 
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Username == login.Username
                               && u.PasswordHash == login.PasswordHash);
 
         if (user == null)
@@ -39,16 +42,16 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim("userId", user.Id.ToString()),
+            new Claim("Id", user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username)
         };
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes("SUPER_SECRET_KEY_12345"));
+        var keyString = _config["Jwt:Key"];
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString!));
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
+            expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
         );
 
