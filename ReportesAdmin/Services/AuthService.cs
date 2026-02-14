@@ -21,11 +21,11 @@ public class AuthService
         _authProvider = authProvider;
     }
 
-    public async Task<bool> Login(string username, string password)
+    public async Task<bool> Login(string username, string passwordHash)
     {
         var response = await _http.PostAsJsonAsync(
             "/api/Auth/login",
-            new { username, password });
+            new { username, passwordHash });
 
         if (!response.IsSuccessStatusCode)
             return false;
