@@ -1,1 +1,33 @@
+# Build
+bin/
+obj/
+
+# Rider / VSCode / VS
+.vs/
+.vscode/
+.idea/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Entity Framework
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets
+appsettings.Development.json
+secrets.json
+
+wwwroot/
+Migrations/
