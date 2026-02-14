@@ -12,7 +12,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // HttpClient base
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:5274")
+    BaseAddress = new Uri("http://localhost:5274")
 });
 
 // Auth
