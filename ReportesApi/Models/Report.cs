@@ -11,8 +11,6 @@ public class Report
     public ReportStatus Status { get; set; } = ReportStatus.Pending;
 
     public int UserId { get; set; }
-    public User User { get; set; } = null!;
-
     public int? UserReviewerId { get; set; }
     public DateTime? ReviewDate { get; set; }
 }

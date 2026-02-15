@@ -1,6 +1,233 @@
 @page "/reports"
 @page "/reportes"
-@* @attribute [Authorize(Roles = "Admin")] *@
 @layout MainLayout
 
-<h3>Reports</h3>
+@inject HttpClient Http
+
+<div class="container mt-4">
+    <h2 style="color:#042a80;">Autorización de reportes</h2>
+
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <select class="form-select" @bind="selectedPosition" @bind:event="onchange">
+                <option value="">-- Filtrar por puesto --</option>
+                @foreach (var pos in positions)
+                {
+                    <option value="@pos">@pos</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" @bind="selectedUserId" @bind:event="onchange">
+                <option value="">-- Filtrar por usuario --</option>
+                @foreach (var u in filteredUsers)
+                {
+                    <option value="@u.Id">@u.Name @u.LastName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="date" class="form-control mb-2" @bind="startDate" />
+            <input type="date" class="form-control" @bind="endDate" />
+        </div>
+    </div>
+
+    <!-- Info del usuario seleccionado -->
+    @if (selectedUser != null)
+    {
+        <div class="mb-3">
+            <p><strong>Nombre:</strong> @selectedUser.Name</p>
+            <p><strong>Apellidos:</strong> @selectedUser.LastName</p>
+            <p><strong>Edad:</strong> @(CalculateAge(selectedUser.BirthDate)) años</p>
+            <p><strong>Puesto:</strong> @selectedUser.Position</p>
+        </div>
+    }
+
+    <!-- Lista de reportes -->
+    <div class="row">
+        @foreach (var report in filteredReports)
+        {
+            var colorClass = report.Status switch
+            {
+                1 => "border-success", // aceptado
+                2 => "border-danger",  // rechazado
+                _ => "border-primary"  // pendiente
+            };
+
+            <div class="col-md-3 mb-3">
+                <div class="card @colorClass" style="cursor:pointer;" @onclick="() => ShowReportModal(report)">
+                    @if (!string.IsNullOrEmpty(report.ImageUrl))
+                    {
+                        <img src="@report.ImageUrl" class="card-img-top" style="object-fit:cover; height:200px;" />
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center" style="height:200px;">
+                            <i class="bi bi-image" style="font-size:3rem; color:gray;"></i>
+                        </div>
+                    }
+                    <div class="card-body text-center">
+                        <h6 class="card-title">@report.Title</h6>
+                        <p class="card-text">@report.CreatedAt.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal detalle reporte -->
+@if (showModal && selectedReport != null)
+{
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalle del reporte</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(selectedReport.ImageUrl))
+                    {
+                        <img src="@selectedReport.ImageUrl" class="img-fluid mb-3" style="object-fit:cover;" />
+                    }
+                    <p><strong>Folio:</strong> @selectedReport.Folio</p>
+                    <p><strong>Título:</strong> @selectedReport.Title</p>
+                    <p><strong>Descripción:</strong> @selectedReport.Description</p>
+                    <p><strong>Fecha:</strong> @selectedReport.CreatedAt.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt")</p>
+                    <p><strong>Estatus:</strong> @(selectedReport.Status == 1 ? "Aceptado" : selectedReport.Status == 2 ? "Rechazado" : "Pendiente")</p>
+                    <p><strong>Supervisor:</strong> @GetUserName(selectedReport.UserId)</p>
+                    <p><strong>Responsable:</strong> @(selectedReport.UserReviewerId != null ? GetUserName(selectedReport.UserReviewerId.Value) : "Sin asignar")</p>
+                    <p><strong>Fecha revisión:</strong> @(selectedReport.ReviewDate != null ? selectedReport.ReviewDate.Value.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt") : "Sin revisar")</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @onclick="() => UpdateStatus(1)">Aceptar</button>
+                    <button class="btn btn-danger" @onclick="() => UpdateStatus(2)">Rechazar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private List<UserResponseDTO> users = new();
+    private List<ReportDto> reports = new();
+    private List<UserResponseDTO> filteredUsers => string.IsNullOrEmpty(selectedPosition) ? users : users.Where(u => u.Position == selectedPosition).ToList();
+    private List<ReportDto> filteredReports => reports
+        .Where(r => (string.IsNullOrEmpty(selectedUserId) || r.UserId.ToString() == selectedUserId)
+                 && (string.IsNullOrEmpty(selectedPosition) || GetUser(r.UserId)?.Position == selectedPosition)
+                 && (!startDate.HasValue || r.CreatedAt.Date >= startDate.Value.Date)
+                 && (!endDate.HasValue || r.CreatedAt.Date <= endDate.Value.Date))
+        .OrderBy(r => r.CreatedAt)
+        .ToList();
+
+    private string? _selectedPosition;
+    private string? selectedPosition
+    {
+        get => _selectedPosition;
+        set
+        {
+            _selectedPosition = value;
+            selectedUserId = null;
+            selectedUser = null;
+        }
+    }
+
+    private string? _selectedUserId;
+    private string? selectedUserId
+    {
+        get => _selectedUserId;
+        set
+        {
+            _selectedUserId = value;
+            selectedUser = users.FirstOrDefault(u => u.Id.ToString() == _selectedUserId);
+        }
+    }
+    private DateTime? startDate;
+    private DateTime? endDate;
+    private UserResponseDTO? selectedUser;
+    private ReportDto? selectedReport;
+    private bool showModal = false;
+
+    private readonly List<string> positions = new()
+    {
+        "Asesor Telefónico","Analista","Contaduria","Disenador","Gerente","Mercadotecnia",
+        "Lider de Proyecto","Programador","Soporte Técnico","Supervisor","Tester"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "/Reportes");
+        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            reports = await response.Content.ReadFromJsonAsync<List<ReportDto>>() ?? new();
+        }
+
+        // también carga usuarios
+        var reqUsers = new HttpRequestMessage(HttpMethod.Get, "/api/Users");
+        reqUsers.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+        var respUsers = await Http.SendAsync(reqUsers);
+        if (respUsers.IsSuccessStatusCode)
+        {
+            users = await respUsers.Content.ReadFromJsonAsync<List<UserResponseDTO>>() ?? new();
+        }
+    }
+
+    private void OnPositionChanged(ChangeEventArgs e)
+    {
+        selectedPosition = e.Value?.ToString();
+        selectedUserId = null;
+        selectedUser = null;
+    }
+
+    private void OnUserChanged(ChangeEventArgs e)
+    {
+        selectedUserId = e.Value?.ToString();
+        selectedUser = users.FirstOrDefault(u => u.Id.ToString() == selectedUserId);
+    }
+
+    private int CalculateAge(DateTime birthDate)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - birthDate.Year;
+        if (birthDate.Date > today.AddYears(-age)) age--;
+        return age;
+    }
+
+    private UserResponseDTO? GetUser(int id) => users.FirstOrDefault(u => u.Id == id);
+    private string GetUserName(int id) => GetUser(id) is UserResponseDTO u ? $"{u.Name} {u.LastName}" : "Desconocido";
+
+    private void ShowReportModal(ReportDto report)
+    {
+        selectedReport = report;
+        showModal = true;
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+        selectedReport = null;
+    }
+
+    private async Task UpdateStatus(int status)
+    {
+        if (selectedReport == null) return;
+
+        var request = new HttpRequestMessage(HttpMethod.Put, "/Reportes")
+        {
+            Content = JsonContent.Create(new { Id = selectedReport.Id, Status = status })
+        };
+        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            selectedReport.Status = status;
+            CloseModal();
+        }
+    }
+}
