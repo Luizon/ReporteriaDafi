@@ -1,0 +1,46 @@
+@inherits LayoutComponentBase
+
+<div class="app-container">
+    <div class="sidebar @(collapsed ? "collapsed" : "")">
+        <div class="toggle" @onclick="ToggleSidebar">
+            <i class="bi bi-list"></i>
+        </div>
+
+        <NavLink href="dashboard" class="menu-item">
+            <i class="bi bi-house"></i>
+            <span>Dashboard</span>
+        </NavLink>
+
+        <NavLink href="reportes" class="menu-item">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Reportes</span>
+        </NavLink>
+
+        <NavLink href="usuarios" class="menu-item">
+            <i class="bi bi-people"></i>
+            <span>Usuarios</span>
+        </NavLink>
+
+        <NavLink href="logout" class="menu-item">
+            <i class="bi bi-arrow-right"></i>
+            <span>Salir</span>
+        </NavLink>
+    </div>
+
+    <div class="main">
+        <TopNavbar />
+
+        <div class="content px-4 py-3">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code {
+    bool collapsed = false;
+
+    void ToggleSidebar()
+    {
+        collapsed = !collapsed;
+    }
+}

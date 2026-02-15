@@ -1,6 +1,8 @@
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using ReportesAdmin;
 using ReportesAdmin.Services;
 
@@ -12,8 +14,9 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // HttpClient base
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5274")
+    BaseAddress = new Uri("https://localhost:7212")
 });
+
 
 // Auth
 builder.Services.AddAuthorizationCore();

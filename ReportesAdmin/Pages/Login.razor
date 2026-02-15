@@ -1,23 +1,49 @@
 @page "/"
 @page "/login"
+@layout PublicLayout
+
 @inject AuthService Auth
+@inject CustomAuthStateProvider AuthProvider
 @inject NavigationManager Nav
 
-<h3>Login</h3>
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="login-card text-center p-4">
+        <h2 class="mb-4" style="color:#042a80;">Iniciar Sesión</h2>
 
-<input @bind="username" placeholder="Username" />
-<input @bind="password" type="password" placeholder="Password" />
-<button @onclick="HandleLogin">Login</button>
+        <div class="form-group mb-3">
+            <input @bind="username" class="form-control login-input" placeholder="Nombre de usuario" />
+        </div>
 
-@if (error != null)
-{
-    <p style="color:red">@error</p>
-}
+        <div class="form-group mb-4">
+            <input @bind="password" type="password" class="form-control login-input" placeholder="Contraseña" />
+        </div>
+
+        <button class="btn login-btn w-100" @onclick="HandleLogin">Entrar</button>
+
+        @if (error != null)
+        {
+            <p class="mt-3" style="color:red">@error</p>
+        }
+    </div>
+</div>
 
 @code {
     private string username = "";
     private string password = "";
     private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            // Ya hay sesión activa, redirigir al dashboard
+            Nav.NavigateTo("/dashboard", forceLoad: true);
+        }
+    }
+
 
     private async Task HandleLogin()
     {
@@ -25,9 +51,11 @@
 
         if (!success)
         {
-            error = "Invalid credentials";
+            error = "Credenciales inválidas";
             return;
         }
+
+        AuthProvider.NotifyUserAuthentication();
 
         Nav.NavigateTo("/dashboard");
     }

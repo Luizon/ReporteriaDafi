@@ -1,4 +1,4 @@
-namespace ReportesAdmin.Models;
+namespace ReportesAdmin.DTOs;
 
 public class UserDto
 {

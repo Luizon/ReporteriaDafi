@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using ReportesAdmin.Models;
+using ReportesAdmin.DTOs;
 
 namespace ReportesAdmin.Services;
 

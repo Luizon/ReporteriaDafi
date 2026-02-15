@@ -1,15 +1,12 @@
-namespace ReportesApi.Models;
+namespace ReportesAdmin.DTOs;
 
-public class User
+public class UserResponseDTO
 {
     public int Id { get; set; }
     public string Username { get; set; } = "";
-    public string PasswordHash { get; set; } = "";
     public string Name { get; set; } = "";
     public string LastName { get; set; } = "";
     public string Position { get; set; } = "";
     public string Role { get; set; } = "";
-    public DateTime BirthDate { get; set; } 
-    public List<string> FcmToken { get; set; } = new();
-    public List<Report> Reports { get; set; } = new();
+    public DateTime BirthDate { get; set; } = new DateTime(1990, 1, 1);
 }

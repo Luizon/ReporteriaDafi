@@ -1,6 +1,29 @@
 @page "/dashboard"
-@attribute [Authorize]
+@* @attribute [Authorize(Roles = "Admin")] *@
+@layout MainLayout
 
-<h3>Dashboard</h3>
+<div class="container text-center mt-3">
+    <h2 class="mb-5" style="color:#042a80;">¿Qué deseas hacer?</h2>
 
-<p>Admin panel.</p>
+    <div class="row justify-content-center">
+        <!-- Gestionar Reportes -->
+        <div class="col-6 col-md-4">
+            <NavLink href="/reportes" class="dashboard-btn">
+                <i class="bi bi-file-earmark-text display-1 d-block mb-3" style="color:white;"></i>
+                <span class="h4" style="color:white;">Gestionar reportes</span>
+            </NavLink>
+        </div>
+
+        <!-- Gestionar Usuarios -->
+        <div class="col-6 col-md-4">
+            <NavLink href="/usuarios" class="dashboard-btn">
+                <i class="bi bi-people display-1 d-block mb-3" style="color:white;"></i>
+                <span class="h4" style="color:white;">Gestionar usuarios</span>
+            </NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Aquí no necesitas lógica, solo navegación
+}

@@ -1,5 +1,6 @@
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using System.Net.Http.Json;
-using ReportesAdmin.Models;
+using ReportesAdmin.DTOs;
 
 namespace ReportesAdmin.Services;
 
@@ -14,6 +15,14 @@ public class UserService
 
     public async Task<List<UserDto>?> GetUsers()
     {
-        return await _http.GetFromJsonAsync<List<UserDto>>("/api/users");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/api/users");
+        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+
+        var response = await _http.SendAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<List<UserDto>>();
     }
 }

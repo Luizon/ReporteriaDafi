@@ -6,6 +6,8 @@ using System.Text;
 using ReportesApi.Data;
 using ReportesApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using ReportesApi.DTOs;
 
 namespace ReportesApi.Controllers;
 
@@ -22,16 +24,28 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(User user)
+    [HttpPost("RegisterWithoutAuth")]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO dto)
     {
+        var user = new User
+        {
+            Username = dto.Username,
+            PasswordHash = dto.PasswordHash,
+            Name = dto.Name,
+            LastName = dto.LastName,
+            Position = dto.Position,
+            Role = dto.Role,
+            BirthDate = dto.BirthDate
+        };
+
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return Ok();
+
+        return Ok(dto);
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(User login)
+    public async Task<IActionResult> Login(UserLoginDTO login)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Username == login.Username
@@ -43,21 +57,111 @@ public class AuthController : ControllerBase
         var claims = new[]
         {
             new Claim("Id", user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username)
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.Role)
         };
 
         var keyString = _config["Jwt:Key"];
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString!));
 
+        var timeAlive = DateTime.UtcNow.AddHours(8);
         var token = new JwtSecurityToken(
+            // issuer: _config["Jwt:Issuer"],
+            // audience: _config["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(8),
+            expires: timeAlive,
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
         );
+        var handler = new JwtSecurityTokenHandler();
+        var tokenString = handler.WriteToken(token);
+
+        Console.WriteLine(tokenString);
+
+        Response.Cookies.Append("AuthToken", tokenString, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = timeAlive
+        });
+
 
         return Ok(new
         {
             token = new JwtSecurityTokenHandler().WriteToken(token)
         });
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] LogoutDTO dto)
+    {
+        var idClaim = User.FindFirst("Id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+        if (idClaim == null)
+            return Unauthorized();
+
+        if (!int.TryParse(idClaim.Value, out var userId))
+            return Unauthorized();
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+            return NotFound(new { message = "user not found" });
+
+        var token = dto?.FcmToken;
+        if (!string.IsNullOrWhiteSpace(token) && user.FcmToken != null)
+        {
+            // si encuentra el token de firebase, lo elimina
+            var removedCount = user.FcmToken.RemoveAll(t => t == token);
+            if (removedCount > 0)
+            {
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // esta linea de aquí ya no es firebase, con esto eliminas la cookie de sesión del cliente
+        Response.Cookies.Append("AuthToken", "", new CookieOptions
+        {
+            Expires = DateTime.UtcNow.AddDays(-1),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None
+        });
+
+
+        return NoContent();
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> Me()
+    {
+        Console.WriteLine(User.Claims.Count());
+        foreach (var claim in User.Claims)        {
+            Console.WriteLine($"{claim.Type}: {claim.Value}");
+        }
+        Console.WriteLine("Claims");
+        if(User.FindFirst("Id") == null) {
+            return Unauthorized("Token inválido");
+        }
+
+        var userId = int.Parse(User.FindFirst("Id")!.Value);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+            return NotFound(new { message = "usuario no encontrado" });
+
+        var dto = new UserResponseDTO
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Name = user.Name,
+            LastName = user.LastName,
+            Position = user.Position,
+            Role = user.Role,
+            BirthDate = user.BirthDate
+        };
+
+        return Ok(dto);
     }
 }

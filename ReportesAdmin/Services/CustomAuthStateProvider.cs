@@ -1,47 +1,93 @@
+using System.Net.Http.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using ReportesAdmin.DTOs;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 
 namespace ReportesAdmin.Services;
 
 public class CustomAuthStateProvider : AuthenticationStateProvider
 {
-    private readonly IJSRuntime _js;
+    private readonly AuthService _auth;
+    private readonly HttpClient _http;
 
-    public CustomAuthStateProvider(IJSRuntime js)
+    public CustomAuthStateProvider(AuthService authService, HttpClient http)
     {
-        _js = js;
+        _auth = authService;
+        _http = http;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await _js.InvokeAsync<string>("localStorage.getItem", "token");
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "/api/Auth/me");
+            request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
-        if (string.IsNullOrWhiteSpace(token))
+            Console.WriteLine(request.Headers);
+
+            var response = await _http.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception();
+
+            var userInfo = await response.Content.ReadFromJsonAsync<UserResponseDTO>();
+
+            var claims = new List<Claim>
+            {
+                new Claim("Id", userInfo.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
+                new Claim(ClaimTypes.Name, userInfo.Username),
+                new Claim(ClaimTypes.Role, userInfo.Position)
+            };
+
+            var identity = new ClaimsIdentity(claims, "jwt");
+            var user = new ClaimsPrincipal(identity);
+
+            return new AuthenticationState(user);
+        }
+        catch(Exception e)
+        {
+            // Si falla, no hay sesión
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
-
-        var identity = new ClaimsIdentity(jwt.Claims, "jwt");
-
-        var user = new ClaimsPrincipal(identity);
-
-        return new AuthenticationState(user);
+        }
     }
 
-    public async Task NotifyUserAuthentication(string token)
+    public async Task NotifyUserAuthentication()
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "/api/Auth/me");
+            request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
-        var identity = new ClaimsIdentity(jwt.Claims, "jwt");
+            var response = await _http.SendAsync(request);
 
-        var user = new ClaimsPrincipal(identity);
+            if (!response.IsSuccessStatusCode)
+                throw new Exception();
 
-        NotifyAuthenticationStateChanged(
-            Task.FromResult(new AuthenticationState(user)));
+            var userInfo = await response.Content.ReadFromJsonAsync<UserResponseDTO>();
+
+            var claims = new List<Claim>
+            {
+                new Claim("Id", userInfo.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
+                new Claim(ClaimTypes.Name, userInfo.Username),
+                new Claim(ClaimTypes.Role, userInfo.Position)
+            };
+
+            var identity = new ClaimsIdentity(claims, "jwt");
+            var user = new ClaimsPrincipal(identity);
+
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+        }
+        catch
+        {
+            // Si falla, notifica la sesión expirada
+            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+        }
     }
 
     public void NotifyUserLogout()
