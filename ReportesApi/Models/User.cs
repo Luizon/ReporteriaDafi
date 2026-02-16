@@ -9,7 +9,7 @@ public class User
     public string LastName { get; set; } = "";
     public string Position { get; set; } = "";
     public string Role { get; set; } = "";
-    public DateTime BirthDate { get; set; } 
-    public List<string> FcmToken { get; set; } = new();
+    public DateTime BirthDate { get; set; }
+    public List<string> FcmTokens { get; set; } = new();
     public List<Report> Reports { get; set; } = new();
 }

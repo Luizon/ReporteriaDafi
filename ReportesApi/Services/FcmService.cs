@@ -3,6 +3,8 @@ using Google.Apis.Util;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
+namespace ReportesApi.Services;
+
 public class FcmService
 {
     private readonly HttpClient _httpClient;
@@ -17,7 +19,9 @@ public class FcmService
     public async Task SendNotificationAsync(IEnumerable<string> tokens, string title, string body)
     {
         // Obtén el access token con las credenciales de Firebase
-        var credential = GoogleCredential.FromFile("Secrets/firebase-service-account.json")
+        var path = Path.Combine(Directory.GetCurrentDirectory(),
+            "Secrets/firebase-service-account.json");
+        var credential = GoogleCredential.FromFile(path)
             .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
         var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
 

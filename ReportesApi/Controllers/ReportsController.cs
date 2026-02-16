@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ReportesApi.Data;
 using ReportesApi.DTOs;
 using ReportesApi.Models;
+using ReportesApi.Services;
 
 namespace ReportesApi.Controllers;
 
@@ -32,7 +33,8 @@ public class ReportsController : ControllerBase
 
         var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
 
-        var result = reports.Select(r => new {
+        var result = reports.Select(r => new
+        {
             r.Id,
             r.Title,
             r.Folio,
@@ -46,17 +48,17 @@ public class ReportsController : ControllerBase
         return Ok(result);
     }
 
-
-    [Authorize (Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAllReports()
     {
         var reports = await _context.Reports
             .ToListAsync();
-        
+
         var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
 
-        var result = reports.Select(r => new {
+        var result = reports.Select(r => new
+        {
             r.Id,
             r.Title,
             r.Folio,
@@ -64,7 +66,7 @@ public class ReportsController : ControllerBase
             r.CreatedAt,
             r.UserId,
             r.Status,
-            ImageUrl = $"{baseUrl}/{r.ImageUrl}",
+            ImageUrl = r.ImageUrl == null ? "" : $"{baseUrl}/{r.ImageUrl}",
             r.UserReviewerId,
             r.ReviewDate
         });

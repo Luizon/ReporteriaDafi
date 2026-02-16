@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ReportesApi.Data;
 using System.Security.Claims;
+using ReportesApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnectionSqlite")));
-    // options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSqlServer")));
+// options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSqlServer")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -35,7 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnMessageReceived = context =>
             {
-                if(context.Request.Cookies.ContainsKey("AuthToken"))
+                if (context.Request.Cookies.ContainsKey("AuthToken"))
                 {
                     context.Token = context.Request.Cookies["AuthToken"];
                 }
@@ -44,7 +45,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Register FcmService with project id from configuration (fallback to literal)
+// Firebase
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<FcmService>(sp =>
 {
     var httpClient = sp.GetRequiredService<HttpClient>();
@@ -59,8 +61,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins(
-                "https://localhost:7017", // web
-                "http://10.0.2.2:7212"  // emulador android
+                "https://localhost:7017" // localhost blazor en kersel
                 )
                   .AllowAnyHeader()
                   .AllowAnyMethod()

@@ -106,10 +106,10 @@ public class AuthController : ControllerBase
             return NotFound(new { message = "user not found" });
 
         var token = dto?.FcmToken;
-        if (!string.IsNullOrWhiteSpace(token) && user.FcmToken != null)
+        if (!string.IsNullOrWhiteSpace(token) && user.FcmTokens != null)
         {
             // si encuentra el token de firebase, lo elimina
-            var removedCount = user.FcmToken.RemoveAll(t => t == token);
+            var removedCount = user.FcmTokens.RemoveAll(t => t == token);
             if (removedCount > 0)
             {
                 _context.Users.Update(user);
@@ -134,7 +134,8 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Me()
     {
-        if(User.FindFirst("Id") == null) {
+        if (User.FindFirst("Id") == null)
+        {
             return Unauthorized("Token inválido");
         }
 
