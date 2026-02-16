@@ -97,13 +97,30 @@ public class ReportsController : ControllerBase
         await _context.SaveChangesAsync();
 
         // Mandar notificación push al usuario que creó el reporte
+        string? imageUrl = null;
+        if (!string.IsNullOrEmpty(report.ImageUrl))
+        {
+            imageUrl = $"{Request.Scheme}://{Request.Host.Value}/{report.ImageUrl}";
+        }
+
         var user = await _context.Users.FindAsync(report.UserId);
         if (user != null && user.FcmTokens.Any())
         {
+            var statusText =
+                report.Status == ReportStatus.Accepted ? "aceptado" :
+                report.Status == ReportStatus.Rejected ? "rechazado" :
+                "actualizado";
+
             await _fcmService.SendNotificationAsync(
-                user.FcmTokens,
-                "Reporte actualizado",
-                $"Tu reporte '{report.Title}' fue {(report.Status == ReportStatus.Accepted ? "aceptado" : report.Status == ReportStatus.Rejected ? "rechazado" : "actualizado")}"
+                tokens: user.FcmTokens,
+                title: "Reporte actualizado",
+                body: $"Tu reporte '{report.Title}' fue {statusText}",
+                imageUrl: imageUrl,
+                data: new Dictionary<string, string>
+                {
+                    { "reportId", report.Id.ToString() },
+                    { "type", "report_update" }
+                }
             );
         }
 

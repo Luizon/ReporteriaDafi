@@ -1,4 +1,4 @@
-package com.example.reportesapp
+package com.luizon.reporteriadafi
 
 import io.flutter.embedding.android.FlutterActivity
 

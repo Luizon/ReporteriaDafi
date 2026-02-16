@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reportesapp/core/navigation/navigator_key.dart';
 import 'package:reportesapp/new_report/new_report_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'login/login_page.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       navigatorObservers: [routeObserver],
+      navigatorKey: navigatorKey,
       routes: {
         '/login': (context) => const LoginPage(),
         '/reports': (context) => const ReportsPage(),

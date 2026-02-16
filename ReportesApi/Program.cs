@@ -57,7 +57,7 @@ builder.Services.AddSingleton<FcmService>(sp =>
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorAndAndroidEmulator",
+    options.AddPolicy("AllowBlazor",
         policy =>
         {
             policy.WithOrigins(
@@ -71,7 +71,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors("AllowBlazorAndAndroidEmulator");
+app.UseCors("AllowBlazor");
 
 app.UseSwagger();
 app.UseSwaggerUI();
