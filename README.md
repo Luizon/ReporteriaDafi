@@ -60,9 +60,9 @@ Y puedes visitar la página de admin entrando a la raíz o al /login
 
     https://localhost:7017/login
 
-Pero Android y iOS no confían en certificados SSL si no son de fuentes confiables como Lets Encrypt, para probar la app primero tuneliza el API y desde la app consume al tunel, no a localhost
-
-    ngrok http https://localhost:7212 --host-header=localhost
+Pero Android y iOS no confían en certificados SSL si no son de fuentes confiables como Lets Encrypt, para probar la app primero tuneliza el API y desde la app consume al tunel, no a localhost. Usa el dominio que ngrok te regala en tu cuenta, para no estar cambiando url a cada que abras un tunel
+    
+    ngrok http --domain=besiegingly-pseudopolitical-lenita.ngrok-free.dev 5274
 
 ### Flutter
 
