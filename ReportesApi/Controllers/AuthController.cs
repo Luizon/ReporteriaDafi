@@ -76,8 +76,6 @@ public class AuthController : ControllerBase
         var handler = new JwtSecurityTokenHandler();
         var tokenString = handler.WriteToken(token);
 
-        Console.WriteLine(tokenString);
-
         Response.Cookies.Append("AuthToken", tokenString, new CookieOptions
         {
             HttpOnly = true,
@@ -89,7 +87,7 @@ public class AuthController : ControllerBase
 
         return Ok(new
         {
-            token = new JwtSecurityTokenHandler().WriteToken(token)
+            role = user.Role
         });
     }
 
@@ -136,11 +134,6 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Me()
     {
-        Console.WriteLine(User.Claims.Count());
-        foreach (var claim in User.Claims)        {
-            Console.WriteLine($"{claim.Type}: {claim.Value}");
-        }
-        Console.WriteLine("Claims");
         if(User.FindFirst("Id") == null) {
             return Unauthorized("Token inválido");
         }

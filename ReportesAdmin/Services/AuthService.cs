@@ -16,7 +16,7 @@ public class AuthService
         _http = http;
     }
 
-    public async Task<bool> Login(string username, string passwordHash)
+    public async Task<LoginResponse?> Login(string username, string passwordHash)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/Auth/login")
         {
@@ -28,11 +28,11 @@ public class AuthService
         var response = await _http.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
-            return false;
+            return null;
 
         var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
 
-        return true;
+        return result;
     }
 
     public async Task Logout()

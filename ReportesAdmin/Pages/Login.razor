@@ -2,6 +2,7 @@
 @page "/login"
 @layout PublicLayout
 
+@using System
 @inject AuthService Auth
 @inject CustomAuthStateProvider AuthProvider
 @inject NavigationManager Nav
@@ -47,11 +48,17 @@
 
     private async Task HandleLogin()
     {
-        var success = await Auth.Login(username, password);
+        var result = await Auth.Login(username, password);
 
-        if (!success)
+        if (result == null)
         {
             error = "Credenciales inválidas";
+            return;
+        }
+
+        if (!string.Equals(result.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            error = "No cuentas con permisos para esta herramienta";
             return;
         }
 

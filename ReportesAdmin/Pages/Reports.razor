@@ -50,9 +50,9 @@
         {
             var colorClass = report.Status switch
             {
-                1 => "border-success", // aceptado
-                2 => "border-danger",  // rechazado
-                _ => "border-primary"  // pendiente
+                1 => "border-success bg-success text-white", // aceptado
+                2 => "border-danger bg-danger text-white",  // rechazado
+                _ => "border-primary bg-primary text-white"  // pendiente
             };
 
             <div class="col-md-3 mb-3">
@@ -159,13 +159,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "/Reportes");
-        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
-        var response = await Http.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            reports = await response.Content.ReadFromJsonAsync<List<ReportDto>>() ?? new();
-        }
+        await LoadReportsAsync();
 
         // también carga usuarios
         var reqUsers = new HttpRequestMessage(HttpMethod.Get, "/api/Users");
@@ -217,7 +211,7 @@
     {
         if (selectedReport == null) return;
 
-        var request = new HttpRequestMessage(HttpMethod.Put, "/Reportes")
+        var request = new HttpRequestMessage(HttpMethod.Put, "/api/Reports")
         {
             Content = JsonContent.Create(new { Id = selectedReport.Id, Status = status })
         };
@@ -226,8 +220,22 @@
         var response = await Http.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            selectedReport.Status = status;
+            // Refresh the full reports list from server, keep filters applied via filteredReports
+            await LoadReportsAsync();
+            // Optionally update the currently selected report reference
+            selectedReport = reports.FirstOrDefault(r => r.Id == selectedReport.Id);
             CloseModal();
+        }
+    }
+
+    private async Task LoadReportsAsync()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "/api/Reports");
+        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            reports = await response.Content.ReadFromJsonAsync<List<ReportDto>>() ?? new();
         }
     }
 }

@@ -28,7 +28,71 @@ public class ReportsController : ControllerBase
             .Where(r => r.UserId == userId)
             .ToListAsync();
 
-        return Ok(reports);
+        var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
+
+        var result = reports.Select(r => new {
+            r.Id,
+            r.Title,
+            r.Folio,
+            r.Description,
+            r.CreatedAt,
+            r.UserId,
+            r.Status,
+            ImageUrl = $"{baseUrl}/{r.ImageUrl}"
+        });
+
+        return Ok(result);
+    }
+
+
+    [Authorize (Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetAllReports()
+    {
+        var reports = await _context.Reports
+            .ToListAsync();
+        
+        var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
+
+        var result = reports.Select(r => new {
+            r.Id,
+            r.Title,
+            r.Folio,
+            r.Description,
+            r.CreatedAt,
+            r.UserId,
+            r.Status,
+            ImageUrl = $"{baseUrl}/{r.ImageUrl}",
+            r.UserReviewerId,
+            r.ReviewDate
+        });
+
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut]
+    public async Task<IActionResult> UpdateStatus([FromBody] UpdateReportStatusDto dto)
+    {
+        var report = await _context.Reports.FindAsync(dto.Id);
+        if (report == null)
+            return NotFound("Reporte no encontrado");
+
+        // Obtener el Id del usuario revisor desde la cookie/claims
+        var reviewerIdClaim = User.FindFirst("Id")?.Value;
+        if (reviewerIdClaim == null)
+            return Unauthorized();
+
+        var reviewerId = int.Parse(reviewerIdClaim);
+
+        // Actualizar campos
+        report.Status = (ReportStatus)dto.Status;
+        report.UserReviewerId = reviewerId;
+        report.ReviewDate = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
     }
 
     [Authorize]
@@ -36,9 +100,6 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> Create([FromForm] CreateReportDto dto)
     {
         // validaciones
-        if (dto == null)
-            return BadRequest("Body is required");
-
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
@@ -70,6 +131,7 @@ public class ReportsController : ControllerBase
         var report = new Report
         {
             Title = dto.Title,
+            Folio = dto.Folio,
             Description = dto.Description,
             CreatedAt = DateTime.UtcNow,
             UserId = userId,

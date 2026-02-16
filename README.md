@@ -18,6 +18,7 @@ Versión de desarrollo
 ### Blazor y ASP.NET
 
 Limpia y obten las dependencias antes de ejecutar los proyectos:
+
     cd ReportesApi
     dotnet clean
     dotnet restore
@@ -28,36 +29,45 @@ Limpia y obten las dependencias antes de ejecutar los proyectos:
     dotnet build
 
 Instala Entity Framework con una versión acorde al .NET utilizado
+
     dotnet tool install --global dotnet-ef --version 8.0.8
 
 Genera la base de datos
+
     cd ReportesApi
     dotnet ef migrations add NewMigrations
     dotnet ef database update
 
 Genera el certificado de https para ambos proyectos
+
     dotnet dev-certs https --trust
 
 Con esto ya puedes ejecutar el servidor y la web usando estos comandos en la carpeta raíz
+
     dotnet run --project ReportesApi
     dotnet run --project ReportesAdmin
 
 Una vez corriendo el servidor, puedes revisar los endpoints directamente en el Swagger
+
     https://localhost:7212/swagger
 
 Y puedes visitar la página de admin entrando a la raíz o al /login
+
     https://localhost:7017/login
 
 ### Flutter
 
 Con Flutter es más simple aún, si ya tienes Flutter ambientado en tu máquina (con todos los checks de **flutter doctor** en verde) solo limpia las dependencias y descargalas nuevamente
+
     flutter clean
     flutter pub get
 
 Luego, puedes ejecutar el sistema
+
     flutter run
 
 o construirlo directamente
+
     flutter build apk --split-per-abi
 
 ## Notas

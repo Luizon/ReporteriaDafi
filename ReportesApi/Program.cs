@@ -12,7 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=reportes.db"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnectionSqlite")));
+    // options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSqlServer")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -46,10 +47,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazor",
+    options.AddPolicy("AllowBlazorAndAndroidEmulator",
         policy =>
         {
-            policy.WithOrigins("https://localhost:7017")
+            policy.WithOrigins(
+                "https://localhost:7017", // web
+                "http://10.0.2.2:7212"  // emulador android
+                )
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -58,7 +62,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors("AllowBlazor");
+app.UseCors("AllowBlazorAndAndroidEmulator");
 
 app.UseSwagger();
 app.UseSwaggerUI();

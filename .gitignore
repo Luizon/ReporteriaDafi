@@ -20,13 +20,75 @@ obj/
 .DS_Store
 Thumbs.db
 
+# Se comenta para efecto de pruebas, pero se recomienda no versionar esta data
 # Entity Framework
-*.db
-*.db-shm
-*.db-wal
+# *.db
+# *.db-shm
+# *.db-wal
 
 # Secrets
 appsettings.Development.json
 secrets.json
 
-Migrations/
+# Se comenta para efecto de pruebas, pero se recomienda no versionar esta data
+# Migraciones de bd
+# Migrations/
+# imagenes subidas con calls de api
+# ReportesApi/wwwroot/uploads/
+
+
+#################################################################
+###################### generado por Flutter #####################
+#################################################################
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+ReportesApp/.atom/
+ReportesApp/.build/
+ReportesApp/.buildlog/
+ReportesApp/.history
+ReportesApp/.svn/
+ReportesApp/.swiftpm/
+ReportesApp/atom/
+ReportesApp/build/
+ReportesApp/buildlog/
+ReportesApp/history
+ReportesApp/svn/
+ReportesApp/swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
