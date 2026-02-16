@@ -1,5 +1,6 @@
 @page "/reports"
 @page "/reportes"
+@attribute [Authorize]
 @layout MainLayout
 
 @inject HttpClient Http
@@ -51,7 +52,7 @@
             var colorClass = report.Status switch
             {
                 1 => "border-success bg-success text-white", // aceptado
-                2 => "border-danger bg-danger text-white",  // rechazado
+                2 => "border-danger bg-danger text-white", // rechazado
                 _ => "border-primary bg-primary text-white"  // pendiente
             };
 
@@ -96,25 +97,29 @@
                     <p><strong>Título:</strong> @selectedReport.Title</p>
                     <p><strong>Descripción:</strong> @selectedReport.Description</p>
                     <p><strong>Fecha:</strong> @selectedReport.CreatedAt.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt")</p>
-                    <p><strong>Estatus:</strong> @(selectedReport.Status == 1 ? "Aceptado" : selectedReport.Status == 2 ? "Rechazado" : "Pendiente")</p>
-                    <p><strong>Supervisor:</strong> @GetUserName(selectedReport.UserId)</p>
-                    <p><strong>Responsable:</strong> @(selectedReport.UserReviewerId != null ? GetUserName(selectedReport.UserReviewerId.Value) : "Sin asignar")</p>
-                    <p><strong>Fecha revisión:</strong> @(selectedReport.ReviewDate != null ? selectedReport.ReviewDate.Value.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt") : "Sin revisar")</p>
+                    <p><strong>Estatus:</strong> @(selectedReport.Status == 1 ? "Aceptado" : selectedReport.Status == 2 ?
+                                            "Rechazado" : "Pendiente")</p>
+                        <p><strong>Supervisor:</strong> @GetUserName(selectedReport.UserId)</p>
+                        <p><strong>Responsable:</strong> @(selectedReport.UserReviewerId != null ?
+                                                GetUserName(selectedReport.UserReviewerId.Value) : "Sin asignar")</p>
+                            <p><strong>Fecha revisión:</strong> @(selectedReport.ReviewDate != null ?
+                                                    selectedReport.ReviewDate.Value.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt") : "Sin revisar")</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-success" @onclick="() => UpdateStatus(1)">Aceptar</button>
+                                <button class="btn btn-danger" @onclick="() => UpdateStatus(2)">Rechazar</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-success" @onclick="() => UpdateStatus(1)">Aceptar</button>
-                    <button class="btn btn-danger" @onclick="() => UpdateStatus(2)">Rechazar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
-}
+                <div class="modal-backdrop fade show"></div>
+            }
 
 @code {
     private List<UserResponseDTO> users = new();
     private List<ReportDto> reports = new();
-    private List<UserResponseDTO> filteredUsers => string.IsNullOrEmpty(selectedPosition) ? users : users.Where(u => u.Position == selectedPosition).ToList();
+    private List<UserResponseDTO> filteredUsers => string.IsNullOrEmpty(selectedPosition) ? users : users.Where(u =>
+u.Position == selectedPosition).ToList();
     private List<ReportDto> filteredReports => reports
         .Where(r => (string.IsNullOrEmpty(selectedUserId) || r.UserId.ToString() == selectedUserId)
                  && (string.IsNullOrEmpty(selectedPosition) || GetUser(r.UserId)?.Position == selectedPosition)

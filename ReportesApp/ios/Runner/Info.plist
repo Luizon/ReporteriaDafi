@@ -66,5 +66,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Necesitamos usar la cámara para adjuntar fotos en los reportes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Necesitamos acceso a tu galería para adjuntar imágenes en los reportes.</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>Usamos notificaciones para avisarte cuando tus reportes cambien de estado.</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
 </dict>
 </plist>

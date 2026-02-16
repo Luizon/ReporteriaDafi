@@ -1,14 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reportesapp/core/services/reports_service.dart';
+import 'package:reportesapp/core/utils/local_storage.dart';
 import 'package:reportesapp/profile/profile_page.dart';
 import 'package:reportesapp/reports/reports_page.dart';
 import '../core/services/auth_service.dart';
 import '../core/services/firebase_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:async';
 
-final loginControllerProvider =
-    AsyncNotifierProvider<LoginController, void>(LoginController.new);
-    
+final loginControllerProvider = AsyncNotifierProvider<LoginController, void>(
+  LoginController.new,
+);
+
 class LoginController extends AsyncNotifier<void> {
   late final AuthService _authService;
 
@@ -32,7 +36,21 @@ class LoginController extends AsyncNotifier<void> {
 
         // Firebase
         try {
+          // primero validar permisos
+          final notifSettings = await FirebaseMessaging.instance
+              .getNotificationSettings();
+          if (notifSettings.authorizationStatus !=
+              AuthorizationStatus.authorized) {
+            await requestAppPermissions();
+          }
+
+          // luego consultar fcm token
           final token = await FirebaseService().initFCM();
+          if (token != null) {
+            LocalStorage.init();
+            LocalStorage.saveFCM(token);
+          }
+
           if (token != null) {
             print('LoginController: FCM token set: $token');
           } else {
@@ -43,7 +61,9 @@ class LoginController extends AsyncNotifier<void> {
         }
         return true;
       } else {
-        print("flutter: Login fallido ${response.data}, status ${response.statusMessage}");
+        print(
+          "flutter: Login fallido ${response.data}, status ${response.statusMessage}",
+        );
         state = AsyncError(
           Exception("Error ${response.statusCode}: ${response.statusMessage}"),
           StackTrace.current,
@@ -55,5 +75,17 @@ class LoginController extends AsyncNotifier<void> {
       state = AsyncError(e, st);
       return false;
     }
+  }
+
+  Future<void> requestAppPermissions() async {
+    // Cámara + galería
+    await [Permission.camera, Permission.photos].request();
+
+    // Notificaciones
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
   }
 }

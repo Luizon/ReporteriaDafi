@@ -1,5 +1,6 @@
 @page "/users"
 @page "/usuarios"
+@attribute [Authorize]
 @layout MainLayout
 
 @inject HttpClient Http
@@ -19,7 +20,7 @@
         }
         else if (!users.Any())
         {
-            <p>No hay usuarios registrados.</p> 
+            <p>No hay usuarios registrados.</p>
         }
         else
         {
@@ -34,7 +35,8 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" @onclick="() => ShowEditUserModal(user)">Editar</a></li>
-                                <li><a class="dropdown-item text-danger" @onclick="() => ShowDeleteUserModal(user)">Eliminar</a></li>
+                                <li><a class="dropdown-item text-danger" @onclick="() => ShowDeleteUserModal(user)">Eliminar</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -72,7 +74,8 @@
                         <input class="form-control" @bind="formUser.Username" placeholder="Username" />
                     </div>
                     <div class="mb-3">
-                        <input class="form-control" @bind="formUser.PasswordHash" type="password" placeholder="Contraseña" />
+                        <input class="form-control" @bind="formUser.PasswordHash" type="password"
+                               placeholder="Contraseña" />
                     </div>
                     <div class="mb-3">
                         <input class="form-control" @bind="formUser.Name" placeholder="Nombre" />
@@ -87,7 +90,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <select class="form-select" @bind="formUser.Position" >
+                        <select class="form-select" @bind="formUser.Position">
                             <option value="Asesor Telefónico">Asesor Telefónico</option>
                             <option value="Analista">Analista</option>
                             <option value="Contaduria">Contaduría</option>
@@ -102,7 +105,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <input class="form-control" @bind="formUser.BirthDate" type="date"/>
+                        <input class="form-control" @bind="formUser.BirthDate" type="date" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -128,25 +131,26 @@
                     <button type="button" class="btn-close" @onclick="CloseDeleteModal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro que quieres eliminar el usuario <strong>@deleteUser?.Name @deleteUser?.LastName</strong>?</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CloseDeleteModal">Cancelar</button>
-                    <button class="btn btn-danger" @onclick="ConfirmDelete">Eliminar</button>
+                    <p>¿Estás seguro que quieres eliminar el usuario <strong>@deleteUser?.Name
+                        @deleteUser?.LastName</strong>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CloseDeleteModal">Cancelar</button>
+                        <button class="btn btn-danger" @onclick="ConfirmDelete">Eliminar</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
-}
+        <div class="modal-backdrop fade show"></div>
+    }
 
 @code {
     private List<UserWithPassDto>? users;
     private List<UserWithPassDto> PagedUsers => users!
-        .OrderBy(u => u.Name + u.LastName)
-        .Skip((CurrentPage - 1) * PageSize)
-        .Take(PageSize)
-        .ToList();
+    .OrderBy(u => u.Name + u.LastName)
+    .Skip((CurrentPage - 1) * PageSize)
+    .Take(PageSize)
+    .ToList();
 
     private int CurrentPage = 1;
     private int PageSize = 10;
@@ -160,11 +164,11 @@
     private bool IsCreateDisabled =>
     editingUser == null &&
     (string.IsNullOrWhiteSpace(formUser.Username) ||
-     string.IsNullOrWhiteSpace(formUser.PasswordHash) ||
-     string.IsNullOrWhiteSpace(formUser.Name) ||
-     string.IsNullOrWhiteSpace(formUser.LastName) ||
-     string.IsNullOrWhiteSpace(formUser.Role) ||
-     string.IsNullOrWhiteSpace(formUser.Position));
+    string.IsNullOrWhiteSpace(formUser.PasswordHash) ||
+    string.IsNullOrWhiteSpace(formUser.Name) ||
+    string.IsNullOrWhiteSpace(formUser.LastName) ||
+    string.IsNullOrWhiteSpace(formUser.Role) ||
+    string.IsNullOrWhiteSpace(formUser.Position));
 
 
     protected override async Task OnInitializedAsync()
@@ -214,11 +218,11 @@
         {
             // Validación: todos los campos obligatorios deben estar llenos
             if (string.IsNullOrWhiteSpace(formUser.Username) ||
-                string.IsNullOrWhiteSpace(formUser.PasswordHash) ||
-                string.IsNullOrWhiteSpace(formUser.Name) ||
-                string.IsNullOrWhiteSpace(formUser.LastName) ||
-                string.IsNullOrWhiteSpace(formUser.Role) ||
-                string.IsNullOrWhiteSpace(formUser.Position))
+            string.IsNullOrWhiteSpace(formUser.PasswordHash) ||
+            string.IsNullOrWhiteSpace(formUser.Name) ||
+            string.IsNullOrWhiteSpace(formUser.LastName) ||
+            string.IsNullOrWhiteSpace(formUser.Role) ||
+            string.IsNullOrWhiteSpace(formUser.Position))
             {
                 // No hace nada si hay campos vacíos
                 return;

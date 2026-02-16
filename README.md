@@ -11,7 +11,7 @@ Frontend (mobile): Flutter
 ## Ambientación
 
 Versión de desarrollo
-**.Net 8.0.418** para Backend y web
+**.Net 8 SDK** para Backend y web
 **Flutter 3.3x** para mobile
 
 
@@ -60,9 +60,20 @@ Y puedes visitar la página de admin entrando a la raíz o al /login
 
     https://localhost:7017/login
 
+Pero Android y iOS no confían en certificados SSL si no son de fuentes confiables como Lets Encrypt, para probar la app primero tuneliza el API y desde la app consume al tunel, no a localhost
+
+    ngrok http https://localhost:7212 --host-header=localhost
+
 ### Flutter
 
-Con Flutter es más simple aún, si ya tienes Flutter ambientado en tu máquina (con todos los checks de **flutter doctor** en verde) solo limpia las dependencias y descargalas nuevamente
+Se sugiere correr flutter doctor para asegurar que todo esté en orden con el ambiente flutter
+
+Ambienta la máquina para firebase
+
+    dart pub global activate flutterfire_cli
+    flutterfire configure
+
+flutterfire configure configurará el proyecto para las plataformas soportadas por tu app, en este caso se debe seleccionar ios y android. Si tu cuenta de firebase tiene más de un proyecto entonces flutterfire configure te mostrará una lista de ellos, selecciona el proyecto correspondiente a la app
 
     flutter clean
     flutter pub get

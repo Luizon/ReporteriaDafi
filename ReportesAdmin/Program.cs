@@ -14,7 +14,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // HttpClient base
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7212")
+    // BaseAddress = new Uri("https://localhost:7212")
+    BaseAddress = new Uri("https://besiegingly-pseudopolitical-lenita.ngrok-free.dev")
 });
 
 
