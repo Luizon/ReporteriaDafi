@@ -12,10 +12,12 @@ namespace ReportesApi.Controllers;
 public class ReportsController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly FcmService _fcmService;
 
-    public ReportsController(AppDbContext context)
+    public ReportsController(AppDbContext context, FcmService fcmService)
     {
         _context = context;
+        _fcmService = fcmService;
     }
 
     [Authorize]
@@ -91,6 +93,17 @@ public class ReportsController : ControllerBase
         report.ReviewDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        // Mandar notificación push al usuario que creó el reporte
+        var user = await _context.Users.FindAsync(report.UserId);
+        if (user != null && user.FcmTokens.Any())
+        {
+            await _fcmService.SendNotificationAsync(
+                user.FcmTokens,
+                "Reporte actualizado",
+                $"Tu reporte '{report.Title}' fue {(report.Status == ReportStatus.Accepted ? "aceptado" : report.Status == ReportStatus.Rejected ? "rechazado" : "actualizado")}"
+            );
+        }
 
         return Ok();
     }

@@ -157,4 +157,28 @@ public class AuthController : ControllerBase
 
         return Ok(dto);
     }
+
+    [Authorize]
+    [HttpPost("save-fcm")]
+    public async Task<IActionResult> SaveFcm([FromBody] SaveFcmDto dto)
+    {
+        var userId = int.Parse(User.FindFirst("Id")!.Value);
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        // Evitar duplicados
+        if (!user.FcmTokens.Contains(dto.FcmToken))
+        {
+            user.FcmTokens.Add(dto.FcmToken);
+            await _context.SaveChangesAsync();
+        }
+
+        return Ok(user.FcmTokens);
+    }
+
+    public class SaveFcmDto
+    {
+        public string FcmToken { get; set; } = string.Empty;
+    }
+
 }

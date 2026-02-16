@@ -42,6 +42,11 @@ Genera el certificado de https para ambos proyectos
 
     dotnet dev-certs https --trust
 
+Instala dependencia para Firebase en el API
+
+    dotnet add package Google.Apis.Auth
+    dotnet add package Google.Apis.FirebaseCloudMessaging.v1
+
 Con esto ya puedes ejecutar el servidor y la web usando estos comandos en la carpeta raíz
 
     dotnet run --project ReportesApi

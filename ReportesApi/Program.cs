@@ -44,6 +44,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Register FcmService with project id from configuration (fallback to literal)
+builder.Services.AddSingleton<FcmService>(sp =>
+{
+    var httpClient = sp.GetRequiredService<HttpClient>();
+    var projectId = builder.Configuration["Firebase:ProjectId"] ?? "reporteria-dafi";
+    return new FcmService(httpClient, projectId);
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {

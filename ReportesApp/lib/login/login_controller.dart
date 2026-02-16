@@ -3,6 +3,7 @@ import 'package:reportesapp/core/services/reports_service.dart';
 import 'package:reportesapp/profile/profile_page.dart';
 import 'package:reportesapp/reports/reports_page.dart';
 import '../core/services/auth_service.dart';
+import '../core/services/firebase_service.dart';
 import 'dart:async';
 
 final loginControllerProvider =
@@ -28,6 +29,18 @@ class LoginController extends AsyncNotifier<void> {
         ref.invalidate(userProvider);
         ref.invalidate(myReportsProvider);
         ref.invalidate(reportsServiceProvider);
+
+        // Firebase
+        try {
+          final token = await FirebaseService().initFCM();
+          if (token != null) {
+            print('LoginController: FCM token set: $token');
+          } else {
+            print('LoginController: no FCM token obtained');
+          }
+        } catch (e) {
+          print('LoginController: initFCM failed: $e');
+        }
         return true;
       } else {
         print("flutter: Login fallido ${response.data}, status ${response.statusMessage}");
