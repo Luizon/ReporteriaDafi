@@ -55,7 +55,7 @@ public class ReportsController : ControllerBase
         var report = await _context.Reports
            .FirstOrDefaultAsync(r => r.Id == id);
 
-        var user = await User.FindFirst("Id")?.Value;
+        var user = User.FindFirst("Id")?.Value;
 
         if (report.UserId.ToString() != user && !User.IsInRole("Admin"))
             return Unauthorized();
