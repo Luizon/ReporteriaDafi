@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reporteriadafi/core/utils/dio_client.dart';
 import 'package:reporteriadafi/core/models/report.dart';
 
-final reportsServiceProvider = Provider<ReportsService>((ref) => ReportsService());
+final reportsServiceProvider = Provider<ReportsService>(
+  (ref) => ReportsService(),
+);
 
 class ReportsService {
   final Dio _dio = DioClient.create("Reports");
@@ -19,8 +21,10 @@ class ReportsService {
       'Folio': folio,
       'Title': title,
       'Description': description,
-      'File': await MultipartFile.fromFile(image.path,
-          filename: image.path.split('/').last),
+      'File': await MultipartFile.fromFile(
+        image.path,
+        filename: image.path.split('/').last,
+      ),
     });
 
     final response = await _dio.post('/', data: formData);
@@ -37,5 +41,4 @@ class ReportsService {
       throw Exception("Error al cargar reportes: ${response.statusCode}");
     }
   }
-
 }
