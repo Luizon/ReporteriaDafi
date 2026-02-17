@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/models/report.dart';
+import 'package:reporteriadafi/core/models/report.dart';
 import 'fullscreen_image_page.dart';
 
 class ReportDetailPage extends StatelessWidget {
@@ -84,6 +84,11 @@ class ReportDetailPage extends StatelessWidget {
               ),
             ),
           ),
+          if (report.reviewDate != null)
+            _buildField("Fecha de revisión",
+                report.reviewDate!.toLocal().toString().split(' ')[0]),
+          if (report.reviewerName != null)
+            _buildField("Quién revisó", report.reviewerName!),
         ],
       ),
     );

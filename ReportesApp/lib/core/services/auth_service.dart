@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:reportesapp/core/services/reports_service.dart';
-import 'package:reportesapp/core/utils/dio_client.dart';
-import 'package:reportesapp/login/login_controller.dart';
-import 'package:reportesapp/new_report/new_report_controller.dart';
-import 'package:reportesapp/profile/profile_page.dart';
-import 'package:reportesapp/reports/reports_page.dart';
+import 'package:reporteriadafi/core/services/reports_service.dart';
+import 'package:reporteriadafi/core/utils/dio_client.dart';
+import 'package:reporteriadafi/login/login_controller.dart';
+import 'package:reporteriadafi/new_report/new_report_controller.dart';
+import 'package:reporteriadafi/profile/profile_page.dart';
+import 'package:reporteriadafi/reports/reports_page.dart';
 import '../utils/local_storage.dart';
 import '../models/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

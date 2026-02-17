@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/utils/route_observer.dart';
 import '../core/services/reports_service.dart';
-import '../core/models/report.dart';
+import 'package:reporteriadafi/core/models/report.dart';
 import '../core/widgets/app_drawer.dart';
 import 'report_detail_page.dart';
 
@@ -34,9 +34,14 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
   }
 
   @override
+  void didPush() {
+    ref.invalidate(myReportsProvider);
+    super.didPush();
+  }
+
+
+  @override
   void didPopNext() {
-    // Called when coming back to this route (another route was popped).
-    // Invalidate so reports are refreshed.
     ref.invalidate(myReportsProvider);
     super.didPopNext();
   }
@@ -130,7 +135,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  report.title,
+                                  report.folio,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -138,9 +143,11 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
                                   ),
                                 ),
                                 Text(
-                                  report.createdAt.toLocal().toString().split(
-                                    ' ',
-                                  )[0],
+                                  report.status == 1
+                                      ? "Aceptado"
+                                      : report.status == 2
+                                          ? "Rechazado"
+                                          : "Pendiente",
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ],

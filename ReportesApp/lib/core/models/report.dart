@@ -6,6 +6,8 @@ class Report {
   final String imageUrl;
   final DateTime createdAt;
   final int status;
+  final DateTime? reviewDate;
+  final String? reviewerName;
 
   Report({
     required this.id,
@@ -15,6 +17,8 @@ class Report {
     required this.imageUrl,
     required this.createdAt,
     required this.status,
+    this.reviewDate,
+    this.reviewerName,
   });
 
   factory Report.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,8 @@ class Report {
       imageUrl: json['imageUrl'],
       createdAt: DateTime.parse(json['createdAt']),
       status: json['status'],
+      reviewDate: json['reviewDate'] != null ? DateTime.parse(json['reviewDate']) : null,
+      reviewerName: json['reviewerName'],
     );
   }
 }

@@ -27,59 +27,71 @@ public class ReportsController : ControllerBase
     {
         var userId = int.Parse(User.FindFirst("Id")!.Value);
 
-        var reports = await _context.Reports
-            .Where(r => r.UserId == userId)
-            .ToListAsync();
+        var baseUrl = $"https://{Request.Host.Value}";
 
-        var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
+        var reports = await (
+            from r in _context.Reports
+            where r.UserId == userId
+            join u in _context.Users on r.UserReviewerId equals u.Id into reviewers
+            from reviewer in reviewers.DefaultIfEmpty() // left join
+            select new
+            {
+                r.Id,
+                r.Title,
+                r.Folio,
+                r.Description,
+                r.CreatedAt,
+                r.UserId,
+                r.Status,
+                ImageUrl = $"{baseUrl}/{r.ImageUrl}",
+                ReviewerName = reviewer != null ? reviewer.Name + " " + reviewer.LastName : null,
+                r.UserReviewerId,
+                r.ReviewDate
+            }
+        ).ToListAsync();
 
-        var result = reports.Select(r => new
-        {
-            r.Id,
-            r.Title,
-            r.Folio,
-            r.Description,
-            r.CreatedAt,
-            r.UserId,
-            r.Status,
-            ImageUrl = $"{baseUrl}/{r.ImageUrl}"
-        });
-
-        return Ok(result);
+        return Ok(reports);
     }
+
 
     [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetReport(int id)
     {
-        var report = await _context.Reports
-           .FirstOrDefaultAsync(r => r.Id == id);
+        var userId = int.Parse(User.FindFirst("Id")!.Value);
 
-        var user = User.FindFirst("Id")?.Value;
+        var baseUrl = $"https://{Request.Host.Value}";
 
-        if (report.UserId.ToString() != user && !User.IsInRole("Admin"))
-            return Unauthorized();
+        var report = await (
+            from r in _context.Reports
+            where r.Id == id
+            join u in _context.Users on r.UserReviewerId equals u.Id into reviewers
+            from reviewer in reviewers.DefaultIfEmpty() // left join
+            select new
+            {
+                r.Id,
+                r.Title,
+                r.Folio,
+                r.Description,
+                r.CreatedAt,
+                r.UserId,
+                r.Status,
+                ImageUrl = $"{baseUrl}/{r.ImageUrl}",
+                ReviewerName = reviewer != null ? reviewer.Name + " " + reviewer.LastName : null,
+                r.UserReviewerId,
+                r.ReviewDate
+            }
+        ).FirstOrDefaultAsync();
 
         if (report == null)
             return NotFound("Reporte no encontrado");
 
-        var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
+        // Validación de permisos
+        var user = User.FindFirst("Id")?.Value;
+        if (report.UserId.ToString() != user && !User.IsInRole("Admin"))
+            return Unauthorized();
 
-        var result = new
-        {
-            report.Id,
-            report.Title,
-            report.Folio,
-            report.Description,
-            report.CreatedAt,
-            report.UserId,
-            report.Status,
-            ImageUrl = $"{baseUrl}/{report.ImageUrl}",
-            report.UserReviewerId,
-            report.ReviewDate
-        };
-
-        return Ok(result);
+        return Ok(report);
     }
 
     [Authorize(Roles = "Admin")]
@@ -89,7 +101,7 @@ public class ReportsController : ControllerBase
         var reports = await _context.Reports
             .ToListAsync();
 
-        var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
+        var baseUrl = $"https://{Request.Host.Value}";
 
         var result = reports.Select(r => new
         {
@@ -134,7 +146,7 @@ public class ReportsController : ControllerBase
         string? imageUrl = null;
         if (!string.IsNullOrEmpty(report.ImageUrl))
         {
-            imageUrl = $"{Request.Scheme}://{Request.Host.Value}/{report.ImageUrl}";
+            imageUrl = $"https://{Request.Host.Value}/{report.ImageUrl}";
         }
 
         var user = await _context.Users.FindAsync(report.UserId);

@@ -69,8 +69,8 @@
                         </div>
                     }
                     <div class="card-body text-center">
-                        <h6 class="card-title">@report.Title</h6>
-                        <p class="card-text">@report.CreatedAt.ToString("dd/MM/yyyy")</p>
+                        <h6 class="card-title">@report.Folio</h6>
+                        <p class="card-text">@StatusString(report.Status)</p>
                     </div>
                 </div>
             </div>
@@ -199,6 +199,13 @@ u.Position == selectedPosition).ToList();
 
     private UserResponseDTO? GetUser(int id) => users.FirstOrDefault(u => u.Id == id);
     private string GetUserName(int id) => GetUser(id) is UserResponseDTO u ? $"{u.Name} {u.LastName}" : "Desconocido";
+
+    private string StatusString(int status) => status switch
+    {
+        1 => "Aceptado",
+        2 => "Rechazado",
+        _ => "Pendiente"
+    };
 
     private void ShowReportModal(ReportDto report)
     {

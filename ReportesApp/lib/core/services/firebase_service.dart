@@ -3,11 +3,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reportesapp/core/navigation/navigator_key.dart';
-import 'package:reportesapp/core/utils/dio_client.dart';
-import 'package:reportesapp/reports/report_detail_page.dart';
+import 'package:reporteriadafi/core/navigation/navigator_key.dart';
+import 'package:reporteriadafi/core/utils/dio_client.dart';
+import 'package:reporteriadafi/reports/report_detail_page.dart';
 import '../utils/local_storage.dart';
-import '../models/report.dart';
+import 'package:reporteriadafi/core/models/report.dart';
 import '../../reports/reports_page.dart';
 
 final firebaseServiceProvider = Provider<FirebaseService>((ref) {
@@ -20,7 +20,7 @@ class FirebaseService {
   final Ref ref;
 
   final Dio _dio = DioClient.create("Auth");
-  final Dio _reportsDio = DioClient.createHttp("/Reports");
+  final Dio _reportsDio = DioClient.create("Reports");
 
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
@@ -36,6 +36,10 @@ class FirebaseService {
     final messaging = FirebaseMessaging.instance;
     await messaging.requestPermission();
     await _initLocalNotifications();
+
+    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    print("fcm: initialMessage = ${initialMessage?.data}");
+    if (initialMessage != null) _handleNavigation(initialMessage.data);
 
     final token = await messaging.getToken();
     if (token != null) {
@@ -56,12 +60,24 @@ class FirebaseService {
     _listenForeground();
     _listenBackgroundTap();
 
+    const androidChannel = AndroidNotificationChannel(
+      'default_channel',
+      'Default',
+      importance: Importance.max,
+    );
+
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidChannel);
+
     return token;
   }
 
   // ---------------- FOREGROUND ----------------
   void _listenForeground() {
     FirebaseMessaging.onMessage.listen((message) {
+      print("fcm: Entra al onMessage.listen");
       final n = message.notification;
       if (n == null) return;
 
@@ -85,11 +101,13 @@ class FirebaseService {
   // ---------------- TAP NOTIFICATION ----------------
   void _listenBackgroundTap() {
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      print("fcm: Entra al onMessageOpenedApp.listen");
       _handleNavigation(message.data);
     });
   }
 
   Future<void> _handleNavigation(Map<String, dynamic> data) async {
+    print("fcm: _handleNavigation: $data");
     final idStr = data['reportId'];
     if (idStr == null) return;
 
@@ -101,19 +119,22 @@ class FirebaseService {
 
       ref.invalidate(myReportsProvider);
 
+      print("fcm: parece correcto");
       _navigate(report);
     } catch (e) {
-      print('FCM navigation error: $e');
+      print('fcm: navigation error: $e');
     }
   }
 
   Future<Report> _fetchReportById(int id) async {
     final res = await _reportsDio.get('/$id');
+    print("fcm: Data received: $res");
     return Report.fromJson(res.data);
   }
 
   void _navigate(Report report) {
     final nav = navigatorKey.currentState;
+    print("fcm: _navigate: $report");
     if (nav == null) return;
 
     nav.push(

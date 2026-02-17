@@ -19,37 +19,39 @@ class AppDrawer extends ConsumerWidget {
     final authService = ref.read(authServiceProvider);
 
     return Drawer(
-      child: Column(
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.indigo),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                'Reportería Dafi',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+      child: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 20, horizontal: 0
+              ),
+              child: Image(
+                image: AssetImage('assets/img/DAFI_banner.png'),
+                fit: BoxFit.contain
               ),
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.assignment),
-            title: const Text('Reportes'),
-            onTap: () => _navigateIfNeeded(context, '/reports'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Perfil'),
-            onTap: () => _navigateIfNeeded(context, '/profile'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Cerrar sesión'),
-            onTap: () async {
-              await authService.logout(ref);
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
+            ListTile(
+              leading: const Icon(Icons.assignment),
+              title: const Text('Reportes'),
+              onTap: () => _navigateIfNeeded(context, '/reports'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Perfil'),
+              onTap: () => _navigateIfNeeded(context, '/profile'),
+            ),
+            Spacer(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Cerrar sesión'),
+              onTap: () async {
+                await authService.logout(ref);
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

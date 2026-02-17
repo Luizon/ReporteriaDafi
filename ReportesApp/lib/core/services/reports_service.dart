@@ -1,15 +1,13 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reportesapp/core/utils/dio_client.dart';
-import '../models/report.dart';
+import 'package:reporteriadafi/core/utils/dio_client.dart';
+import 'package:reporteriadafi/core/models/report.dart';
 
 final reportsServiceProvider = Provider<ReportsService>((ref) => ReportsService());
 
 class ReportsService {
-  // se usa createHttp para bypassear la seguridad de android por certificado https en localhost
-  // esto NO DEBE LLEGAR A PRODUCCIÓN
-  final Dio _dio = DioClient.createHttp("/Reports");
+  final Dio _dio = DioClient.create("Reports");
 
   Future<Response> createReport({
     required String folio,

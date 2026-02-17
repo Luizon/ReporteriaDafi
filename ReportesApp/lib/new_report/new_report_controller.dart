@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reportesapp/reports/reports_page.dart';
+import 'package:reporteriadafi/reports/reports_page.dart';
 import '../core/services/reports_service.dart';
 import 'dart:async';
 

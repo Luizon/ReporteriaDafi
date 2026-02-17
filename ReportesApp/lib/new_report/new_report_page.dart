@@ -27,6 +27,14 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
     }
   }
 
+  Future<void> _shootPhoto() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.camera);
+    if (picked != null) {
+      setState(() => _image = File(picked.path));
+    }
+  }
+
   bool _isFormComplete() {
     return _folioController.text.isNotEmpty &&
       _titleController.text.isNotEmpty &&
@@ -110,9 +118,33 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
                 _image == null
                     ? const Text("No hay imagen seleccionada")
                     : Image.file(_image!, height: 150),
-                ElevatedButton(
-                  onPressed: _pickImage,
-                  child: const Text("Seleccionar imagen"),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _pickImage,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.photo_library),
+                              SizedBox(width: 8),
+                              Text("Seleccionar imagen"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10,),
+                    ElevatedButton(
+                      onPressed: _shootPhoto,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: const Icon(Icons.camera_alt),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(

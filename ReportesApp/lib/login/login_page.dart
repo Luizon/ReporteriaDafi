@@ -28,10 +28,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       try {
         final authService = ref.read(authServiceProvider);
         final user = await authService.me();
-        if (user != null) {
-          if (mounted) {
-            Navigator.pushReplacementNamed(context, '/reports');
-          }
+        if (user != null && mounted) {
+          Navigator.pushReplacementNamed(context, '/reports');
         }
       } catch (e) {
         print("flutter: Sesión inválida o error: $e");
@@ -42,45 +40,140 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final loginState = ref.watch(loginControllerProvider);
+    final loginError = ref.watch(loginErrorProvider);
+
+    // Mostrar snackbar si hay error nuevo
+    if (loginError != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              loginError,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        // limpiar el error para que no se repita
+        ref.read(loginErrorProvider.notifier).state = null;
+      });
+    }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Usuario'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Contraseña'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: loginState.isLoading
-                  ? null
-                  : () async {
-                      final success = await ref
-                          .read(loginControllerProvider.notifier)
-                          .login(emailController.text, passwordController.text);
-
-                      if (success && mounted) {
-                        Navigator.pushReplacementNamed(context, '/reports');
-                      }
-                    },
-              child: loginState.isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Iniciar sesión'),
-            ),
-            if (loginState.hasError)
-              Text(
-                "Ocurrió un error inesperado",
-                style: const TextStyle(color: Colors.red),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Banner superior
+              Image.asset(
+                'assets/img/DAFI_banner.png',
+                width: double.infinity,
+                fit: BoxFit.cover,
               ),
-          ],
+              const SizedBox(height: 32),
+        
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    // Campo usuario
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        labelText: 'Usuario',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 16),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+        
+                    // Campo contraseña
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        labelText: 'Contraseña',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 16),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+        
+                    // Botón login
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff042a80),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 6,
+                          shadowColor: Colors.black45,
+                        ),
+                        onPressed: loginState.isLoading
+                            ? null
+                            : () async {
+                                final success = await ref
+                                    .read(loginControllerProvider.notifier)
+                                    .login(emailController.text,
+                                        passwordController.text);
+        
+                                if (success && mounted) {
+                                  Navigator.pushReplacementNamed(
+                                      context, '/reports');
+                                } else if (loginState.hasError && mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        loginState.error.toString().contains("401") ||
+                                                loginState.error.toString().contains("403")
+                                            ? "Credenciales incorrectas"
+                                            : loginState.error.toString().contains("400")
+                                                ? "Solicitud inválida"
+                                                : "Ocurrió un error inesperado.",
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor: Colors.red,
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                  );
+                                }
+                              },
+                        child: loginState.isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                'Iniciar sesión',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
