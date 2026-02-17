@@ -40,7 +40,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
                 new Claim("Id", userInfo.Id.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
                 new Claim(ClaimTypes.Name, userInfo.Username),
-                new Claim(ClaimTypes.Role, userInfo.Position)
+                new Claim(ClaimTypes.Role, userInfo.Role)
             };
 
             var identity = new ClaimsIdentity(claims, "jwt");
@@ -48,7 +48,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
             return new AuthenticationState(user);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             // Si falla, no hay sesión
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
@@ -74,7 +74,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
                 new Claim("Id", userInfo.Id.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
                 new Claim(ClaimTypes.Name, userInfo.Username),
-                new Claim(ClaimTypes.Role, userInfo.Position)
+                new Claim(ClaimTypes.Role, userInfo.Role)
             };
 
             var identity = new ClaimsIdentity(claims, "jwt");
