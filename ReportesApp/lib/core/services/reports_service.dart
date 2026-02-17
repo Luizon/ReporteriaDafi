@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reportesapp/core/utils/dio_client.dart';
 import '../models/report.dart';
 
-final reportsServiceProvider = Provider<ReportsService>((ref) => ReportsService());
+final reportsServiceProvider = Provider<ReportsService>(
+  (ref) => ReportsService(),
+);
 
 class ReportsService {
   // se usa createHttp para bypassear la seguridad de android por certificado https en localhost
   // esto NO DEBE LLEGAR A PRODUCCIÓN
-  final Dio _dio = DioClient.createHttp("/Reports");
+  final Dio _dio = DioClient.create("Reports");
 
   Future<Response> createReport({
     required String folio,
@@ -21,8 +23,10 @@ class ReportsService {
       'Folio': folio,
       'Title': title,
       'Description': description,
-      'File': await MultipartFile.fromFile(image.path,
-          filename: image.path.split('/').last),
+      'File': await MultipartFile.fromFile(
+        image.path,
+        filename: image.path.split('/').last,
+      ),
     });
 
     final response = await _dio.post('/', data: formData);
@@ -39,5 +43,4 @@ class ReportsService {
       throw Exception("Error al cargar reportes: ${response.statusCode}");
     }
   }
-
 }

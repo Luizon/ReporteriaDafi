@@ -20,7 +20,7 @@ class FirebaseService {
   final Ref ref;
 
   final Dio _dio = DioClient.create("Auth");
-  final Dio _reportsDio = DioClient.createHttp("/Reports");
+  final Dio _reportsDio = DioClient.create("Reports");
 
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();

@@ -33,22 +33,22 @@ class DioClient {
     return dio;
   }
 
-  // esto NO DEBE LLEGAR A PRODUCCIÓN, solo se agregó para pruebas en localhost
-  static Dio createHttp(String subpath) {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: '$ngrokHttps/$subpath',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-        },
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-      ),
-    );
-    // Interceptor de cookies
-    dio.interceptors.add(CookieInterceptor());
+  // // esto NO DEBE LLEGAR A PRODUCCIÓN, solo se agregó para pruebas en localhost
+  // static Dio createHttp(String subpath) {
+  //   final dio = Dio(
+  //     BaseOptions(
+  //       baseUrl: '$ngrokHttps/$subpath',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Cache-Control': 'no-cache',
+  //       },
+  //       connectTimeout: const Duration(seconds: 5),
+  //       receiveTimeout: const Duration(seconds: 5),
+  //     ),
+  //   );
+  //   // Interceptor de cookies
+  //   dio.interceptors.add(CookieInterceptor());
 
-    return dio;
-  }
+  //   return dio;
+  // }
 }
