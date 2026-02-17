@@ -69,7 +69,7 @@
                         </div>
                     }
                     <div class="card-body text-center">
-                        <h6 class="card-title">@report.Folio</h6>
+                        <h6 class="card-title">@report.Id</h6>
                         <p class="card-text">@StatusString(report.Status)</p>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                     {
                         <img src="@selectedReport.ImageUrl" class="img-fluid mb-3" style="object-fit:cover;" />
                     }
-                    <p><strong>Folio:</strong> @selectedReport.Folio</p>
+                    <p><strong>Folio:</strong> @selectedReport.Id</p>
                     <p><strong>Título:</strong> @selectedReport.Title</p>
                     <p><strong>Descripción:</strong> @selectedReport.Description</p>
                     <p><strong>Fecha:</strong> @selectedReport.CreatedAt.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt")</p>

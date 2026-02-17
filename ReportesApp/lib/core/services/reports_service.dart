@@ -12,13 +12,11 @@ class ReportsService {
   final Dio _dio = DioClient.create("Reports");
 
   Future<Response> createReport({
-    required String folio,
     required String title,
     required String description,
     required File image,
   }) async {
     final formData = FormData.fromMap({
-      'Folio': folio,
       'Title': title,
       'Description': description,
       'File': await MultipartFile.fromFile(

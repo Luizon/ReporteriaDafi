@@ -14,7 +14,6 @@ class NewReportPage extends ConsumerStatefulWidget {
 
 class _NewReportPageState extends ConsumerState<NewReportPage> {
   final _formKey = GlobalKey<FormState>();
-  final _folioController = TextEditingController();
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
   File? _image;
@@ -36,7 +35,7 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
   }
 
   bool _isFormComplete() {
-    return _folioController.text.isNotEmpty &&
+    return 
       _titleController.text.isNotEmpty &&
       _descController.text.isNotEmpty &&
       _image != null;
@@ -94,13 +93,6 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
             key: _formKey,
             child: ListView(
               children: [
-                TextFormField(
-                  controller: _folioController,
-                  decoration: const InputDecoration(labelText: 'Folio'),
-                  onChanged: (_) => setState(() {}),
-                  keyboardType: TextInputType.number,
-                  validator: (v) => v!.isEmpty ? 'Campo requerido' : null,
-                ),
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(labelText: 'Título'),
@@ -171,7 +163,6 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
                               Response? response = await ref
                                   .read(newReportControllerProvider.notifier)
                                   .submitReport(
-                                    folio: _folioController.text,
                                     title: _titleController.text,
                                     description: _descController.text,
                                     image: _image!,

@@ -209,7 +209,7 @@ public class ReportsController : ControllerBase
         var report = new Report
         {
             Title = dto.Title,
-            Folio = dto.Folio,
+            Folio = "eliminar_campo",
             Description = dto.Description,
             CreatedAt = DateTime.UtcNow,
             UserId = userId,

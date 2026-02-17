@@ -135,7 +135,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  report.folio,
+                                  report.id.toString(),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,

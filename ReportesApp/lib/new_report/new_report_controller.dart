@@ -15,7 +15,6 @@ class NewReportController extends AsyncNotifier<void> {
   }
 
   Future<Response?> submitReport({
-    required String folio,
     required String title,
     required String description,
     required File image,
@@ -23,7 +22,6 @@ class NewReportController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       Response response = await ref.read(reportsServiceProvider).createReport(
-        folio: folio,
         title: title,
         description: description,
         image: image,
@@ -33,6 +31,7 @@ class NewReportController extends AsyncNotifier<void> {
       state = const AsyncData(null);
       return response;
     } catch (e, st) {
+      print("Error al crear reporte: $e");
       state = AsyncError(e, st);
     }
     return null;
