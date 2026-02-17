@@ -36,6 +36,8 @@ secrets.json
 # imagenes subidas con calls de api
 # ReportesApi/wwwroot/uploads/
 secrets/
+ReportesAdmin/publish-blazor
+ReportesApi/publish
 
 #################################################################
 ###################### generado por Flutter #####################

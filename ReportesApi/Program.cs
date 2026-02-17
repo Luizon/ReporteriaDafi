@@ -61,7 +61,8 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins(
-                "https://localhost:7017" // localhost blazor en kersel
+                "https://localhost:7017", // localhost blazor en kersel
+                "https://localhost:8080"  // localhost blazor en iis
                 )
                   .AllowAnyHeader()
                   .AllowAnyMethod()
