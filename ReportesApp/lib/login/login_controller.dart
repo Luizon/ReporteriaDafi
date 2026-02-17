@@ -45,7 +45,7 @@ class LoginController extends AsyncNotifier<void> {
           }
 
           // luego consultar fcm token
-          final token = await FirebaseService().initFCM();
+          final token = await ref.read(firebaseServiceProvider).initFCM();
           if (token != null) {
             LocalStorage.init();
             LocalStorage.saveFCM(token);

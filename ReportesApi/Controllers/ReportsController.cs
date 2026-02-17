@@ -48,6 +48,40 @@ public class ReportsController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetReport(int id)
+    {
+        var report = await _context.Reports
+           .FirstOrDefaultAsync(r => r.Id == id);
+
+        var user = await User.FindFirst("Id")?.Value;
+
+        if (report.UserId.ToString() != user && !User.IsInRole("Admin"))
+            return Unauthorized();
+
+        if (report == null)
+            return NotFound("Reporte no encontrado");
+
+        var baseUrl = $"{Request.Scheme}://{Request.Host.Value}";
+
+        var result = new
+        {
+            report.Id,
+            report.Title,
+            report.Folio,
+            report.Description,
+            report.CreatedAt,
+            report.UserId,
+            report.Status,
+            ImageUrl = $"{baseUrl}/{report.ImageUrl}",
+            report.UserReviewerId,
+            report.ReviewDate
+        };
+
+        return Ok(result);
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAllReports()

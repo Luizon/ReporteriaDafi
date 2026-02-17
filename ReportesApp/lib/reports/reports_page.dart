@@ -46,9 +46,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
     final reportsAsync = ref.watch(myReportsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reportes'),
-      ),
+      appBar: AppBar(title: const Text('Reportes')),
       drawer: const AppDrawer(),
       body: Column(
         children: [
@@ -140,7 +138,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
                                   ),
                                 ),
                                 Text(
-                                  report.createdAt.toLocal().toString().split(' ')[0],
+                                  report.createdAt.toLocal().toString().split(
+                                    ' ',
+                                  )[0],
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ],
@@ -152,11 +152,12 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
                   );
                 },
               ),
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, st) => Center(
-                child: Text("Error al cargar reportes: $err",
-                    style: const TextStyle(color: Colors.red)),
+                child: Text(
+                  "Error al cargar reportes: $err",
+                  style: const TextStyle(color: Colors.red),
+                ),
               ),
             ),
           ),
