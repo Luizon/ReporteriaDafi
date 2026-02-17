@@ -67,8 +67,6 @@ public class AuthController : ControllerBase
 
         var timeAlive = DateTime.UtcNow.AddHours(8);
         var token = new JwtSecurityToken(
-            // issuer: _config["Jwt:Issuer"],
-            // audience: _config["Jwt:Audience"],
             claims: claims,
             expires: timeAlive,
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)

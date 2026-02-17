@@ -19,7 +19,6 @@ public class UsersController : ControllerBase
         _context = context;
     }
 
-    // GET: api/Users
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUsers()
@@ -47,7 +46,6 @@ public class UsersController : ControllerBase
         return Ok(dtos);
     }
 
-    // GET: api/Users/{id}
     [HttpGet("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUser(int id)
@@ -71,7 +69,6 @@ public class UsersController : ControllerBase
         return Ok(dto);
     }
 
-    // POST: api/Users
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO dto)
@@ -93,8 +90,7 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
 
-    // PUT: api/Users/{id}
-    // Si el requester intenta cambiar position solo funcionará si es admin
+    // Si el requester intenta cambiar role solo funcionará si es admin
     // Si no es admin, aún puede cambiar el resto de valores de su usuario
     [HttpPut("{id}")]
     [Authorize]
@@ -111,8 +107,8 @@ public class UsersController : ControllerBase
         if (requesterId != id && !isAdmin)
             return Forbid();
 
-        // si es su usuario, pero quiere cambiar la position sin ser admin, no se permite continuar
-        if (!string.IsNullOrEmpty(dto.Position) && !isAdmin)
+        // si es su usuario, pero quiere cambiar el rol sin ser admin, no se permite continuar
+        if (!string.IsNullOrEmpty(dto.Role) && !isAdmin)
             return Forbid();
 
         // ningun campo es obligatorio, se actualizará lo que se reciba del json
@@ -137,7 +133,6 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    // DELETE: api/Users/{id}
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteUser(int id)

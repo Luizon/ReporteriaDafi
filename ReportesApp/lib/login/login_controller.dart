@@ -32,7 +32,7 @@ class LoginController extends AsyncNotifier<void> {
 
       if (response.statusCode == 200) {
         state = const AsyncData(null);
-        // Invalidate user and reports providers so UI fetches fresh data
+
         ref.invalidate(userProvider);
         ref.invalidate(myReportsProvider);
         ref.invalidate(reportsServiceProvider);
@@ -70,8 +70,8 @@ class LoginController extends AsyncNotifier<void> {
         final msg = response.statusCode == 401 || response.statusCode == 403
             ? "Credenciales incorrectas"
             : response.statusCode == 400
-                ? "Solicitud inválida"
-                : "Ocurrió un error inesperado.";
+            ? "Solicitud inválida"
+            : "Ocurrió un error inesperado.";
         ref.read(loginErrorProvider.notifier).state = msg;
 
         state = AsyncData(null);
@@ -83,8 +83,8 @@ class LoginController extends AsyncNotifier<void> {
         final msg = e.toString().contains("401") || e.toString().contains("403")
             ? "Credenciales incorrectas"
             : e.toString().contains("400")
-                ? "Solicitud inválida"
-                : "Ocurrió un error inesperado.";
+            ? "Solicitud inválida"
+            : "Ocurrió un error inesperado.";
         ref.read(loginErrorProvider.notifier).state = msg;
       }
       print("flutter: Login fallido $e");

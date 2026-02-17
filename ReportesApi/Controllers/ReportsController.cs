@@ -86,7 +86,6 @@ public class ReportsController : ControllerBase
         if (report == null)
             return NotFound("Reporte no encontrado");
 
-        // Validación de permisos
         var user = User.FindFirst("Id")?.Value;
         if (report.UserId.ToString() != user && !User.IsInRole("Admin"))
             return Unauthorized();
@@ -128,21 +127,18 @@ public class ReportsController : ControllerBase
         if (report == null)
             return NotFound("Reporte no encontrado");
 
-        // Obtener el Id del usuario revisor desde la cookie/claims
         var reviewerIdClaim = User.FindFirst("Id")?.Value;
         if (reviewerIdClaim == null)
             return Unauthorized();
 
         var reviewerId = int.Parse(reviewerIdClaim);
 
-        // Actualizar campos
         report.Status = (ReportStatus)dto.Status;
         report.UserReviewerId = reviewerId;
         report.ReviewDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
 
-        // Mandar notificación push al usuario que creó el reporte
         string? imageUrl = null;
         if (!string.IsNullOrEmpty(report.ImageUrl))
         {

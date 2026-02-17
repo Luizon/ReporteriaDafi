@@ -31,7 +31,8 @@ class ReportDetailPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => FullScreenImagePage(imageUrl: report.imageUrl),
+                  builder: (_) =>
+                      FullScreenImagePage(imageUrl: report.imageUrl),
                 ),
               );
             },
@@ -62,13 +63,15 @@ class ReportDetailPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          
+
           // Campos con estilo uniforme
           _buildField("Título", report.title),
           _buildField("Descripción", report.description),
           _buildField("Folio", report.id.toString()),
-          _buildField("Fecha de registro",
-              report.createdAt.toLocal().toString().split(' ')[0]),
+          _buildField(
+            "Fecha de registro",
+            report.createdAt.toLocal().toString().split(' ')[0],
+          ),
           Container(
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(16),
@@ -79,7 +82,11 @@ class ReportDetailPage extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  "Estatus: ${report.status == 1 ? "Aceptado" : report.status == 2 ? "Rechazado" : "Pendiente"}",
+                  "Estatus: ${report.status == 1
+                      ? "Aceptado"
+                      : report.status == 2
+                      ? "Rechazado"
+                      : "Pendiente"}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -93,14 +100,19 @@ class ReportDetailPage extends StatelessWidget {
               "Fecha de revisión",
               report.reviewDate!.toLocal().toString().split(' ')[0],
               label2: "Quién revisó",
-              value2: report.reviewerName ?? "Desconocido"
+              value2: report.reviewerName ?? "Desconocido",
             ),
         ],
       ),
     );
   }
 
-  Widget _buildField(String label, String value, {String? label2, String? value2}) {
+  Widget _buildField(
+    String label,
+    String value, {
+    String? label2,
+    String? value2,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -122,10 +134,7 @@ class ReportDetailPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 18, color: Colors.black87),
           ),
           if (label2 != null && value2 != null) ...[
             const SizedBox(height: 12),
@@ -140,10 +149,7 @@ class ReportDetailPage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               value2,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 18, color: Colors.black87),
             ),
           ],
         ],

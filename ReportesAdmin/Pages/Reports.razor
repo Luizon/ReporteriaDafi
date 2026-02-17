@@ -98,12 +98,12 @@
                     <p><strong>Descripción:</strong> @selectedReport.Description</p>
                     <p><strong>Fecha:</strong> @selectedReport.CreatedAt.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt")</p>
                     <p><strong>Estatus:</strong> @(selectedReport.Status == 1 ? "Aceptado" : selectedReport.Status == 2 ?
-                                            "Rechazado" : "Pendiente")</p>
+                                                                    "Rechazado" : "Pendiente")</p>
                         <p><strong>Supervisor:</strong> @GetUserName(selectedReport.UserId)</p>
                         <p><strong>Responsable:</strong> @(selectedReport.UserReviewerId != null ?
-                                                GetUserName(selectedReport.UserReviewerId.Value) : "Sin asignar")</p>
+                                                                            GetUserName(selectedReport.UserReviewerId.Value) : "Sin asignar")</p>
                             <p><strong>Fecha revisión:</strong> @(selectedReport.ReviewDate != null ?
-                                                    selectedReport.ReviewDate.Value.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt") : "Sin revisar")</p>
+                                                                                    selectedReport.ReviewDate.Value.ToString("dd 'de' MMMM 'de' yyyy hh:mm tt") : "Sin revisar")</p>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-success" @onclick="() => UpdateStatus(1)">Aceptar</button>
@@ -232,9 +232,7 @@ u.Position == selectedPosition).ToList();
         var response = await Http.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            // Refresh the full reports list from server, keep filters applied via filteredReports
             await LoadReportsAsync();
-            // Optionally update the currently selected report reference
             selectedReport = reports.FirstOrDefault(r => r.Id == selectedReport.Id);
             CloseModal();
         }

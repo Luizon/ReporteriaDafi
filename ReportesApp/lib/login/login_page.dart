@@ -66,19 +66,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Banner superior
               Image.asset(
                 'assets/img/DAFI_banner.png',
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
               const SizedBox(height: 32),
-        
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   children: [
-                    // Campo usuario
                     TextField(
                       controller: emailController,
                       decoration: InputDecoration(
@@ -90,12 +88,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 16),
+                          vertical: 20,
+                          horizontal: 16,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
-        
-                    // Campo contraseña
+
                     TextField(
                       controller: passwordController,
                       obscureText: true,
@@ -108,12 +107,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 16),
+                          vertical: 20,
+                          horizontal: 16,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 32),
-        
-                    // Botón login
+
                     SizedBox(
                       width: double.infinity,
                       height: 56,
@@ -131,23 +131,35 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             : () async {
                                 final success = await ref
                                     .read(loginControllerProvider.notifier)
-                                    .login(emailController.text,
-                                        passwordController.text);
-        
+                                    .login(
+                                      emailController.text,
+                                      passwordController.text,
+                                    );
+
                                 if (success && mounted) {
                                   Navigator.pushReplacementNamed(
-                                      context, '/reports');
+                                    context,
+                                    '/reports',
+                                  );
                                 } else if (loginState.hasError && mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        loginState.error.toString().contains("401") ||
-                                                loginState.error.toString().contains("403")
+                                        loginState.error.toString().contains(
+                                                  "401",
+                                                ) ||
+                                                loginState.error
+                                                    .toString()
+                                                    .contains("403")
                                             ? "Credenciales incorrectas"
-                                            : loginState.error.toString().contains("400")
-                                                ? "Solicitud inválida"
-                                                : "Ocurrió un error inesperado.",
-                                        style: const TextStyle(color: Colors.white),
+                                            : loginState.error
+                                                  .toString()
+                                                  .contains("400")
+                                            ? "Solicitud inválida"
+                                            : "Ocurrió un error inesperado.",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
                                       ),
                                       backgroundColor: Colors.red,
                                       duration: const Duration(seconds: 3),

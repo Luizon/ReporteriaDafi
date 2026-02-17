@@ -11,7 +11,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// HttpClient base
 builder.Services.AddScoped(sp => new HttpClient
 {
     // BaseAddress = new Uri("https://localhost:7212") // kestrel
@@ -19,7 +18,6 @@ builder.Services.AddScoped(sp => new HttpClient
 });
 
 
-// Auth
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CustomAuthStateProvider>();

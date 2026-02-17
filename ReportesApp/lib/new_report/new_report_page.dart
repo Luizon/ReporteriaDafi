@@ -35,10 +35,9 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
   }
 
   bool _isFormComplete() {
-    return 
-      _titleController.text.isNotEmpty &&
-      _descController.text.isNotEmpty &&
-      _image != null;
+    return _titleController.text.isNotEmpty &&
+        _descController.text.isNotEmpty &&
+        _image != null;
   }
 
   Future<bool> _confirmExit() async {
@@ -67,26 +66,26 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
     final reportState = ref.watch(newReportControllerProvider);
 
     return PopScope(
-  canPop: false, // bloquea el pop automático
-  onPopInvokedWithResult : (didPop, result) async {
-    if (didPop) return;
-    final exit = await _confirmExit();
-    if (exit) {
-      Navigator.pop(context);
-    }
-  },
-  child: Scaffold(
-    appBar: AppBar(
-      title: const Text('Nuevo Reporte'),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () async {
-          if (await _confirmExit()) {
-            Navigator.pop(context);
-          }
-        },
-      ),
-    ),
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final exit = await _confirmExit();
+        if (exit) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Nuevo Reporte'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () async {
+              if (await _confirmExit()) {
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ),
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: Form(
@@ -128,7 +127,7 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: _shootPhoto,
                       child: Padding(
@@ -143,8 +142,8 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
                   onPressed: reportState.isLoading || !_isFormComplete()
                       ? null
                       : () async {
-                          if (_formKey.currentState!.validate() && _image != null) {
-                            // Mostrar modal de carga
+                          if (_formKey.currentState!.validate() &&
+                              _image != null) {
                             showDialog(
                               context: context,
                               barrierDismissible: false,
@@ -167,25 +166,28 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
                                     description: _descController.text,
                                     image: _image!,
                                   );
-                              if(response == null) {
+                              if (response == null) {
                                 throw Exception("Ocurrio un error");
                               }
 
-                              Navigator.pop(context); // cerrar modal de carga
+                              Navigator.pop(context);
 
-                              // Mostrar modal de éxito
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
                                 builder: (_) => AlertDialog(
-                                  title: const Text("Éxito",
-                                      style: TextStyle(color: Colors.green)),
-                                  content: const Text("El reporte se ha creado correctamente."),
+                                  title: const Text(
+                                    "Éxito",
+                                    style: TextStyle(color: Colors.green),
+                                  ),
+                                  content: const Text(
+                                    "El reporte se ha creado correctamente.",
+                                  ),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.pop(context); // cerrar modal
-                                        Navigator.pop(context); // salir de NewReportPage
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
                                       },
                                       child: const Text("Aceptar"),
                                     ),
@@ -193,21 +195,24 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
                                 ),
                               );
                             } catch (e) {
-                              Navigator.pop(context); // cerrar modal de carga
+                              Navigator.pop(context);
 
-                              // Mostrar modal de error
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
                                 builder: (_) => AlertDialog(
-                                  title: const Text("Error",
-                                      style: TextStyle(color: Colors.red)),
-                                  content: Text("No se pudo subir el reporte: $e"),
+                                  title: const Text(
+                                    "Error",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                  content: Text(
+                                    "No se pudo subir el reporte: $e",
+                                  ),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.pop(context); // cerrar modal
-                                        Navigator.pop(context); // salir de NewReportPage
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
                                       },
                                       child: const Text("Aceptar"),
                                     ),
@@ -220,8 +225,8 @@ class _NewReportPageState extends ConsumerState<NewReportPage> {
                   child: reportState.isLoading
                       ? const CircularProgressIndicator()
                       : _isFormComplete()
-                        ? const Text("Guardar reporte")
-                        : const Text("Completa todos los campos"),
+                      ? const Text("Guardar reporte")
+                      : const Text("Completa todos los campos"),
                 ),
               ],
             ),

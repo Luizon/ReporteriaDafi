@@ -39,7 +39,6 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
     super.didPush();
   }
 
-
   @override
   void didPopNext() {
     ref.invalidate(myReportsProvider);
@@ -62,7 +61,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF042A80), // azul solicitado
+                  backgroundColor: const Color(0xFF042A80),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
@@ -111,7 +110,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: statusColor, // fondo según status
+                        color: statusColor,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -139,15 +138,15 @@ class _ReportsPageState extends ConsumerState<ReportsPage> with RouteAware {
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    color: Colors.white, // texto blanco
+                                    color: Colors.white,
                                   ),
                                 ),
                                 Text(
                                   report.status == 1
                                       ? "Aceptado"
                                       : report.status == 2
-                                          ? "Rechazado"
-                                          : "Pendiente",
+                                      ? "Rechazado"
+                                      : "Pendiente",
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ],
